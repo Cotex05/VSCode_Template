@@ -1057,3 +1057,632 @@ public:
         return true;
     }
 };
+
+// Binary Indexed Tree
+struct FenwickTreeOneBasedIndexing
+{
+    vector<int> bit; // binary indexed tree
+    int n;
+
+    FenwickTreeOneBasedIndexing(int n)
+    {
+        this->n = n + 1;
+        bit.assign(n + 1, 0);
+    }
+
+    FenwickTreeOneBasedIndexing(vector<int> &a) : FenwickTreeOneBasedIndexing(a.size())
+    {
+        for (int i = 0; i < a.size(); i++)
+            add(i, a[i]);
+    }
+
+    int sum(int idx)
+    {
+        int ret = 0;
+        for (++idx; idx > 0; idx -= idx & -idx)
+            ret += bit[idx];
+        return ret;
+    }
+
+    int sum(int l, int r)
+    {
+        return sum(r) - sum(l - 1);
+    }
+
+    void add(int idx, int delta)
+    {
+        for (++idx; idx < n; idx += idx & -idx)
+            bit[idx] += delta;
+    }
+};
+
+/**************BINARY--TREE**************/
+
+class binaryTree
+{
+public:
+    int data;
+    binaryTree *left;
+    binaryTree *right;
+
+    binaryTree(int data)
+    { /// constructor
+        this->data = data;
+        left = NULL;
+        right = NULL;
+    }
+
+    ~binaryTree()
+    { /// recursive destructor
+        delete left;
+        delete right;
+    }
+};
+
+binaryTree *takeinput()
+{
+    int rootdata;
+    cout << "Enter root data: " << endl;
+    cin >> rootdata;
+
+    if (rootdata == -1)
+    {
+        return NULL;
+    }
+
+    binaryTree *root = new binaryTree(rootdata);
+    binaryTree *leftchlid = takeinput();
+    binaryTree *rightchlid = takeinput();
+
+    root->left = leftchlid;
+    root->right = rightchlid;
+
+    return root;
+}
+
+binaryTree *takeinput2()
+{ /// levelwise input taking
+    int rootdata;
+    cout << "Enter root data: " << endl;
+    cin >> rootdata;
+    if (rootdata == -1)
+        return NULL;
+    binaryTree *root = new binaryTree(rootdata);
+    queue<binaryTree *> q;
+    q.push(root);
+
+    while (!q.empty())
+    {
+        binaryTree *f = q.front();
+        q.pop();
+
+        int leftchild;
+        cout << "Enter left child of " << f->data << "th node: " << endl;
+        cin >> leftchild;
+        if (leftchild != -1)
+        {
+            binaryTree *child = new binaryTree(leftchild);
+            q.push(child);
+            f->left = child;
+        }
+        int rightchild;
+        cout << "Enter right child of " << f->data << "th node: " << endl;
+        cin >> rightchild;
+        if (rightchild != -1)
+        {
+            binaryTree *child = new binaryTree(rightchild);
+            q.push(child);
+            f->right = child;
+        }
+    }
+    return root;
+}
+
+bool found(binaryTree *root, int key)
+{
+    if (root == NULL)
+        return false;
+    if (root->data == key)
+        return true;
+    return found(root->left, key) || found(root->right, key);
+}
+
+int minValue(binaryTree *root)
+{
+    if (root == NULL)
+        return im;
+
+    int leftmin = minValue(root->left);
+    int rightmin = minValue(root->right);
+
+    return min(root->data, min(leftmin, rightmin));
+}
+
+int maxValue(binaryTree *root)
+{
+    if (root == NULL)
+        return in;
+
+    int leftmax = maxValue(root->left);
+    int rightmax = maxValue(root->right);
+
+    return max(root->data, max(leftmax, rightmax));
+}
+
+int countNodes(binaryTree *root)
+{
+    if (root == NULL)
+        return 0;
+    return countNodes(root->left) + countNodes(root->right) + 1;
+}
+
+int countLeafNode(binaryTree *root)
+{
+    if (root == NULL)
+        return 0;
+    if (root->left == NULL && root->right == NULL)
+        return 1;
+    return countLeafNode(root->left) + countLeafNode(root->right);
+}
+
+void printTree(binaryTree *root)
+{
+    if (root == NULL)
+        return;
+
+    cout << root->data << ": ";
+
+    if (root->left)
+        cout << "L" << root->left->data << " ";
+    if (root->right)
+        cout << "R" << root->right->data;
+
+    cout << endl;
+
+    printTree(root->left);
+    printTree(root->right);
+}
+
+bool getpath(binaryTree *root, int val, vector<int> &ans)
+{
+    if (root == NULL)
+        return false;
+
+    ans.pb(root->data);
+    if (root->data == val)
+        return true;
+
+    bool left = getpath(root->left, val, ans);
+    bool right = getpath(root->right, val, ans);
+
+    if (left || right)
+        return true;
+    ans.pop_back();
+    return false;
+}
+
+void solvebinarytree()
+{
+    binaryTree *root = takeinput2();
+    printTree(root);
+    vector<int> ans;
+    cout << getpath(root, 9, ans) << endl;
+    fi(i, ans.size()) cout << ans[i] << " ";
+    cout << endl;
+    return;
+}
+
+* /
+
+    /***********BINARY-SEARCH-TREE***********/
+
+    class Pair
+{
+public:
+    binaryTree *head;
+    binaryTree *tail;
+};
+
+class bst
+{
+    binaryTree *root;
+
+private:
+    void printTree(binaryTree *node)
+    {
+        if (node == NULL)
+            return;
+
+        cout << node->data << ": ";
+
+        if (node->left)
+            cout << "L" << node->left->data << " ";
+        if (node->right)
+            cout << "R" << node->right->data;
+
+        cout << endl;
+
+        printTree(node->left);
+        printTree(node->right);
+    }
+    binaryTree *insrt(binaryTree *node, int data)
+    {
+        if (node == NULL)
+        {
+            binaryTree *r = new binaryTree(data);
+            return r;
+        }
+        if (data < node->data)
+        {
+            node->left = insrt(node->left, data);
+        }
+        else
+        {
+            node->right = insrt(node->right, data);
+        }
+        return node;
+    }
+    binaryTree *deletedata(binaryTree *node, int data)
+    {
+        if (root == NULL)
+            return NULL;
+
+        if (data > node->data)
+            node->right = deletedata(node->right, data);
+        else if (data < node->data)
+            node->left = deletedata(node->left, data);
+        else
+        {
+            if (node->left == NULL && node->right == NULL)
+            {
+                delete node;
+                return NULL;
+            }
+            else if (node->left == NULL && node->right != NULL)
+            {
+                binaryTree *temp = node->right;
+                node->right = NULL;
+                delete node;
+                return temp;
+            }
+            else if (node->left != NULL && node->right == NULL)
+            {
+                binaryTree *temp = node->left;
+                node->left = NULL;
+                delete node;
+                return temp;
+            }
+            else
+            {
+                binaryTree *minNode = node->right;
+                while (minNode->left != NULL)
+                    minNode = minNode->left;
+                int rightMin = minNode->data;
+                node->data = rightMin;
+                node->right = deletedata(node->right, rightMin);
+            }
+        }
+        return node;
+    }
+    Pair convertToLL(binaryTree *root)
+    {
+        if (root == NULL)
+        {
+            Pair ans;
+            ans.head = NULL;
+            ans.tail = NULL;
+            return ans;
+        }
+        if (root->left == NULL && root->right == NULL)
+        {
+            Pair p;
+            p.head = root;
+            p.tail = root;
+            return p;
+        }
+        else if (root->left != NULL && root->right == NULL)
+        {
+            Pair leftLL = convertToLL(root->left);
+            leftLL.tail->right = root;
+            Pair ans;
+            ans.head = leftLL.head;
+            ans.tail = root;
+            return ans;
+        }
+        else if (root->left == NULL && root->right != NULL)
+        {
+            Pair rightLL = convertToLL(root->right);
+            root->right = rightLL.head;
+            Pair ans;
+            ans.head = root;
+            ans.tail = rightLL.tail;
+            return ans;
+        }
+        else
+        {
+            Pair leftLL = convertToLL(root->left);
+            Pair rightLL = convertToLL(root->right);
+            leftLL.tail->right = root;
+            root->right = rightLL.head;
+            Pair ans;
+            ans.head = leftLL.head;
+            ans.tail = rightLL.tail;
+            return ans;
+        }
+    }
+
+public:
+    bst()
+    {
+        root == NULL;
+    }
+    ~bst()
+    {
+        delete root;
+    }
+    void insrt1(int data)
+    {
+        root = insrt(root, data);
+    }
+    void print()
+    {
+        printTree(root);
+    }
+    void del(int data)
+    {
+        deletedata(root, data);
+    }
+    binaryTree *convertLL()
+    {
+        Pair p = convertToLL(root);
+        binaryTree *tmp = p.head;
+        while (tmp != NULL)
+        {
+            tmp->left = NULL;
+            tmp = tmp->right;
+        }
+        return p.head;
+    }
+};
+
+void solvebst()
+{
+    bst b;
+    b.insrt1(4);
+    b.insrt1(2);
+    b.insrt1(1);
+    b.insrt1(3);
+    b.insrt1(6);
+    b.insrt1(5);
+    b.insrt1(7);
+    b.print();
+    binaryTree *head = b.convertLL();
+    binaryTree *tmp = head;
+    while (tmp != NULL)
+    {
+        cout << tmp->data << "->";
+        tmp = tmp->right;
+    }
+    return;
+}
+
+/**************GENERIC-TREE**************/
+
+class TreeNode
+{
+public:
+    int data;
+    vector<TreeNode *> children;
+    TreeNode(int data)
+    {
+        this->data = data;
+    }
+    ~TreeNode()
+    {
+        for (int i = 0; i < children.size(); i++)
+        {
+            delete children[i];
+        }
+    }
+};
+
+TreeNode *takeinput()
+{ /// recursive approach of taking input
+    int rootdata;
+    cout << "Enter data: " << endl;
+    cin >> rootdata;
+    TreeNode *root = new TreeNode(rootdata);
+    /// how many children
+    cout << "Enter number of children: " << endl;
+    int n;
+    cin >> n;
+    fi(i, n)
+    {
+        TreeNode *child = takeinput();
+        root->children.pb(child); /// make connection b/w root and its children
+    }
+    return root;
+}
+
+TreeNode *takeinput2()
+{ /// iterative way of taking input level wise using queue
+    int rootdata;
+    cout << "Enter the root data " << endl;
+    cin >> rootdata;
+    TreeNode *root = new TreeNode(rootdata);
+    queue<TreeNode *> q;
+    q.push(root);
+
+    while (!q.empty())
+    { /// 1.create node,2.push node,3.connect node
+        TreeNode *f = q.front();
+        q.pop();
+
+        cout << "Enter no of children of " << f->data << endl;
+        int n;
+        cin >> n;
+        ;
+
+        for (int i = 1; i <= n; i++)
+        {
+            int childdata;
+            cout << "Enter the " << i << "th child of" << f->data << endl;
+            cin >> childdata;
+
+            TreeNode *child = new TreeNode(childdata);
+            q.push(child);
+            f->children.pb(child);
+        }
+    }
+    return root;
+}
+
+void printTree(TreeNode *root)
+{ /// printing each parent and their children
+    cout << root->data << ": ";
+    for (int i = 0; i < root->children.size(); i++)
+    {
+        cout << root->children[i]->data << ", ";
+    }
+    cout << endl;
+    for (int i = 0; i < root->children.size(); i++)
+    {
+        printTree(root->children[i]);
+    }
+}
+
+void printTree2(TreeNode *root)
+{ /// way of printing level wise
+    queue<TreeNode *> q;
+    q.push(root);
+    while (!q.empty())
+    {
+        TreeNode *f = q.front();
+        q.pop();
+        cout << f->data << ": ";
+        for (int i = 0; i < f->children.size(); i++)
+        {
+            cout << f->children[i]->data << ", ";
+            q.push(f->children[i]);
+        }
+        cout << endl;
+    }
+}
+
+int countNodes(TreeNode *root)
+{
+    if (root == NULL)
+        return 0;
+    int ans = 1;
+    for (int i = 0; i < root->children.size(); i++)
+    {
+        ans += countNodes(root->children[i]);
+    }
+    return ans;
+}
+
+int height(TreeNode *root)
+{
+    int mx = 0;
+    for (int i = 0; i < root->children.size(); i++)
+    {
+        int childrenheight = height(root->children[i]);
+        if (childrenheight > mx)
+        {
+            mx = childrenheight;
+        }
+    }
+    return mx + 1;
+}
+
+void preOrderTraversal(TreeNode *root)
+{
+    if (root == NULL)
+    {
+        cout << "No data" << endl;
+        return;
+    }
+    cout << root->data << " ";
+    for (int i = 0; i < root->children.size(); i++)
+    {
+        preOrderTraversal(root->children[i]);
+    }
+}
+
+void postOrderTraversal(TreeNode *root)
+{
+    if (root == NULL)
+    {
+        cout << "No data" << endl;
+        return;
+    }
+    for (int i = 0; i < root->children.size(); i++)
+    {
+        postOrderTraversal(root->children[i]);
+    }
+    cout << root->data << " ";
+}
+
+void element_at_depthk(TreeNode *root, int k)
+{
+    if (root == NULL)
+    {
+        return;
+    }
+    if (k == 0)
+    {
+        cout << root->data << endl;
+        return;
+    }
+    for (int i = 0; i < root->children.size(); i++)
+    {
+        element_at_depthk(root->children[i], k - 1);
+    }
+}
+
+void deleteTree(TreeNode *root)
+{ /// just like post traversal
+    if (root == NULL)
+        return;
+    for (int i = 0; i < root->children.size(); i++)
+    {
+        deleteTree(root->children[i]);
+    }
+    delete root;
+}
+
+int countLeafNodes(TreeNode *root)
+{
+    if (root == NULL)
+        return 0;
+    if (root->children.size() == 0)
+    {
+        return 1;
+    }
+    int ans = 0;
+    for (int i = 0; i < root->children.size(); i++)
+    {
+        ans += countLeafNodes(root->children[i]);
+    }
+    return ans;
+}
+
+void solvetree()
+{
+    TreeNode *root = new TreeNode(1);
+    TreeNode *n1 = new TreeNode(2);
+    TreeNode *n2 = new TreeNode(3);
+
+    root->children.pb(n1);
+    root->children.pb(n2);
+    / TreeNode *root = takeinput2();
+
+    preOrderTraversal(root);
+    cout << endl;
+    postOrderTraversal(root);
+    delete root;
+    //    printTree2(root);
+    //    cout<<countNodes(root)<<endl;
+    //    cout<<height(root)<<endl;
+    return;
+}
