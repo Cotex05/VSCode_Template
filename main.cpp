@@ -22,60 +22,128 @@ const int INF = INT_MAX;
 #define __ " "
 #define fi first
 #define se second
+#define f(i, a, b) for (long long i = a; i < b; i++)
+#define rf(i, a, b) for (long long i = a; i >= b; i--)
 using namespace std;
 
-void solve1()
+const int borne = (int)(1e6) + 5;
+const int WAIT = 0, ENTERED = 1, LEFT = 2;
+int state[borne];
+
+long long Ceiling(long long a, long long b)
+{
+    return (a + b - 1) / b;
+}
+
+clock_t time_p = clock();
+void clk()
+{
+    time_p = clock() - time_p;
+    cerr << "Execution Time: " << 100 * (float)(time_p) / CLOCKS_PER_SEC << "ms\n";
+}
+
+ll power(ll x, ll y)
+{
+    ll result = 1;
+    while (y > 0)
+    {
+        if (y % 2 == 0) // y is even
+        {
+            x = x * x;
+            y = y / 2;
+        }
+        else // y isn't even
+        {
+            result = result * x;
+            y = y - 1;
+        }
+    }
+    return result;
+}
+
+ll nearestSquare(ll n)
+{
+    return power(ceil(sqrt(n)), 2);
+}
+
+void faisal()
 {
     ll n;
     cin >> n;
-    vector<pair<int, int>> vp(n);
-    for (int i = 0; i < n; i++)
+    vector<ll> arr(n, -1);
+    ll val = n - 1;
+    ll c = 0;
+    while (c < n)
     {
-        cin >> vp[i].first >> vp[i].second;
-    }
-    vector<int> hash(n + 1);
-    for (auto p : vp)
-    {
-        for (int i = p.first; i <= p.second; i++)
+        ll ns = nearestSquare(val);
+        ll k = ns - val;
+        for (ll i = k; i < n; i++)
         {
-            hash[i]++;
+            if (arr[i] == -1)
+            {
+                arr[i] = val;
+                val--;
+                c++;
+            }
+            else
+            {
+                break;
+            }
         }
     }
-    int mx = 0;
-    for (int i = 1; i <= n; i++)
+    for (auto e : arr)
     {
-        mx = max(hash[i], mx);
+        cout << e << " ";
     }
-    int c = 0;
-    for (int i = 1; i < n; i++)
-    {
-        if (hash[i] == mx)
-        {
-            c++;
-        }
-    }
-    cout << c << "\n";
-    for (int i = 1; i <= n; i++)
-    {
-        if (hash[i] == mx)
-        {
-            cout << i << "\n";
-        }
-    }
+    cout << "\n";
 }
 
-int solve(int n, string s)
+bool isPrime(int x)
 {
-    int result = 0;
- 
-    int count[26] = {0};
-    for (int i=0; i<n; i++)
-        count[s[i]-'a']++;
- 
-    for (int i=0; i<26; i++)
-        result += (count[i]*(count[i]+1)/2);
- 
-    int ans = n*(n+1)/2 - result;
+    x = abs(x);
+    if(x<2){
+        return false;
+    }
+    for (int i = 2; i*i <= x; i++)
+    {
+        if (x % i == 0)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+int sumPrime(int l, int r){
+    int ans = 0;
+    for(int i=l; i<=r; i++){
+        if(isPrime(i)){
+            ans = i;
+            break;
+        }
+    }
+    for(int i=r; i>=l; i--){
+        if(isPrime(i)){
+            ans+=i;
+            break;
+        }
+    }
+    return ans;
+}
+
+vector<int> funcArrange(vector<int> inputArr){
+    int n = inputArr.size();
+    vector<int> ans;
+    for(int i=0; i<n; i++){
+        if(inputArr[i]%2==0){
+            ans.push_back(inputArr[i]);
+        }
+    }
+    for(int i=0; i<n; i++){
+        if(inputArr[i]%2==1){
+            ans.push_back(inputArr[i]);
+        }
+    }
     return ans;
 }
 
@@ -94,10 +162,16 @@ int main()
     {
         int n;
         cin >> n;
-        string s;
-        cin >> s;
-        cout << solve(n, s);
+        vector<int> arr(n);
+        for(auto &e: arr){
+            cin >> e;
+        }
+        auto v = funcArrange(arr);
+        for(auto e: v){
+            cout << e << " ";
+        }
     }
+    // clk();
 
     return 0;
 }

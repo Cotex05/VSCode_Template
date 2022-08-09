@@ -23,6 +23,13 @@ using namespace std;
 //  a+b = a&b+a|b
 //  a+b = a^b+2*(a&b)
 
+clock_t time_p = clock();
+void clk()
+{
+    time_p = clock() - time_p;
+    cerr << "Execution Time: " << (float)(time_p) / CLOCKS_PER_SEC << "\n";
+}
+
 template <typename... T>
 void read(T &...args)
 {
@@ -58,7 +65,7 @@ ll gcd(ll a, ll b)
 {
     if (b == 0)
         return a;
-    return gcd(b, b % a);
+    return gcd(b, a % b);
 }
 
 bool isPrime(ll x)
@@ -183,6 +190,42 @@ ll lcm(ll x, ll y)
     return x * y / __gcd(x, y);
 }
 
+void perm(string &s, int l, int r)
+{
+    if (l == r)
+    {
+        cout << s << "\n";
+        return;
+    }
+    for (int i = l; i <= r; i++)
+    {
+        swap(s[l], s[i]);
+        perm(s, l + 1, r);
+        swap(s[l], s[i]);
+    }
+}
+
+vector<int> all_prime_factors(int n)
+{
+    vector<int> factors;
+    for (int i = 2; i * i <= n; i++)
+    {
+        if (n % i == 0)
+        {
+            factors.push_back(i);
+        }
+        while (n % i == 0)
+        {
+            n /= i;
+        }
+    }
+    if (n > 1)
+    {
+        factors.push_back(n);
+    }
+    return factors;
+}
+
 long long subarrayXor(int arr[], int n)
 {
     long long ans = 0;
@@ -289,7 +332,7 @@ ll phi(ll n)
     return result;
 }
 
-// function generate all prime number less then N in O(n)
+// function generate all prime number less then N in O(n*log(log(n)))
 const long long MAX_SIZE = 1000001;
 
 vector<ll> isprime(MAX_SIZE, true);
@@ -317,6 +360,35 @@ void manipulatedSeive(int N)
             SPF[i * prime[j]] = prime[j];
         }
     }
+}
+
+int makeSieve(int n)
+{
+
+    vector<bool> isPrime(n + 1, true);
+    isPrime[0] = false;
+    isPrime[1] = false;
+
+    for (int i = 2; i * i <= n; i++)
+    {
+        if (isPrime[i] == true)
+        {
+            for (int j = i * i; j <= n; j += i)
+            {
+                isPrime[j] = false;
+            }
+        }
+    }
+
+    int count = 0;
+    for (int i = 0; i <= n; i++)
+    {
+        if (isPrime[i] == true)
+        {
+            count++;
+        }
+    }
+    return count;
 }
 
 // Geometry
@@ -891,6 +963,7 @@ vector<int> bellman_ford(int n, vector<vector<int>> adj, int src)
     }
     return dist;
 }
+
 // Prim's Algorithm for MST
 vector<int> prims(int n, vector<pair<int, int>> adj[])
 {
@@ -1466,6 +1539,30 @@ void solvebst()
     return;
 }
 
+// Binary Index Tree
+class BIT
+{ // One-based indexing
+    vector<int> bit;
+
+public:
+    BIT(int size = 0)
+    {
+        bit.assign(size + 1, 0);
+    }
+    int getSum(int idx)
+    { // Get sum in range [1..idx]
+        int sum = 0;
+        for (; idx > 0; idx -= idx & (-idx))
+            sum += bit[idx];
+        return sum;
+    }
+    void addValue(int idx, int val)
+    { // update
+        for (; idx < bit.size(); idx += idx & (-idx))
+            bit[idx] += val;
+    }
+};
+
 /**************GENERIC-TREE**************/
 
 class TreeNode
@@ -1686,3 +1783,46 @@ void solvetree()
     //    cout<<height(root)<<endl;
     return;
 }
+
+struct SegmentTree
+{
+    int n;
+    vector<int> tree;
+    SegmentTree() {}
+    void build(int v, int tl, int tr, const vector<int> &a)
+    {
+        if (tl >= tr)
+        {
+            return;
+        }
+        else if (tl == tr - 1)
+        {
+            tree[v] = a[tl];
+        }
+        else
+        {
+            int tm = (tl + tr) / 2;
+            build(v * 2, tl, tm, a);
+            build(v * 2 + 1, tm, tr, a);
+            tree[v] = max(tree[v * 2], tree[v * 2 + 1]);
+        }
+    }
+    SegmentTree(const vector<int> &a) : n(a.size()), tree(4 * n, 0)
+    {
+        build(1, 0, n, a);
+    }
+    int getMax(int v, int tl, int tr, int l, int r) const
+    {
+        if (tl >= r || tr <= l)
+            return -INF;
+        if (tl >= l && tr <= r)
+            return tree[v];
+        int tm = (tl + tr) / 2;
+        return max(getMax(v * 2, tl, tm, l, r), getMax(v * 2 + 1, tm, tr, l, r));
+    }
+    int getMax(int l, int r) const
+    {
+        // return *max_element(tree.begin() + l, tree.begin() + r + 1);
+        return getMax(1, 0, n, l, r + 1);
+    }
+};
