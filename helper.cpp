@@ -36,10 +36,54 @@ void read(T &...args)
     ((cin >> args), ...);
 }
 
+ll nextNearestSquare(ll n)
+{
+    return power(ceil(sqrt(n)), 2);
+}
+
 bool cmp(pair<int, int> a, pair<int, int> b)
 {
     return a.second < b.second; // ascending order by second element
 }
+
+/*------------- Extended Euclid Algorithm  -----------------*/
+
+class Triplet
+{
+public:
+    int x;
+    int y;
+    int gcd;
+};
+
+Triplet extendedEuclid(int a, int b) // a > b
+{
+    if (b == 0)
+    {
+        Triplet ans;
+        ans.gcd = a;
+        ans.x = y;
+        ans.x = 0;
+    }
+
+    Triplet smallAns = new extendedEuclid(b, a % b);
+    Triplet ans;
+    ans.gcd = smallAns.gcd;
+    ans.x = smallAns.y;
+    ans.y = smallAns.x - (a / b) * smallAns.y;
+    retuen ans;
+}
+
+// Multiplicative Inverse Modulo
+// (a*b)%m=1, find b if a and m is known. => a*b+m*q=1
+// b value exist iff gcd(a,b)=1
+Triplet mulModInv(int a, int m)
+{
+    auto ans = extendedEuclid(a, m);
+    return ans.x;
+}
+
+/*------------END-------------*/
 
 bool isPalindrome(string s)
 {
@@ -61,7 +105,7 @@ bool isPowerOfTwo(ll x)
     return x && (!(x & (x - 1)));
 }
 
-ll gcd(ll a, ll b)
+ll gcd(ll a, ll b) // if a > b
 {
     if (b == 0)
         return a;
@@ -332,6 +376,31 @@ ll phi(ll n)
     return result;
 }
 
+// O(nloglogn) phi(n) for all number upto n
+// phi(n) = n*(1-1/p1)*(1-1/p2)....
+vector<int> eulerPhi(int n)
+{
+    vector<int> phi(n + 1);
+
+    for (int i = 1; i <= n; i++)
+    {
+        phi[i] = i;
+    }
+
+    for (int i = 2; i <= n; i++)
+    {
+        if (phi[i] == i) // it means it is prime
+        {
+            phi[i] = i - 1; // as Φ(p)=Φ(p-1)
+            for (int j = 2 * i; j <= n; j += i)
+            {
+                phi[j] = (phi[j] * (i - 1)) / i;
+            }
+        }
+    }
+    return phi;
+}
+
 // function generate all prime number less then N in O(n*log(log(n)))
 const long long MAX_SIZE = 1000001;
 
@@ -390,6 +459,237 @@ int makeSieve(int n)
     }
     return count;
 }
+
+/*-----------Segmented Sieve------------*/
+#define MAX 100001
+vector<ll> sieve()
+{
+
+    bool isPrime[MAX];
+    for (int i = 0; i < MAX; i++)
+    {
+        isPrime[i] = true;
+    }
+    for (int i = 2; i * i < MAX; i++)
+    {
+        if (isPrime[i])
+        {
+            for (int j = i * i; j < MAX; j += i)
+            {
+                isPrime[j] = false;
+            }
+        }
+    }
+    vector<ll> primes;
+    primes.push_back(2);
+    for (int i = 3; i < MAX; i += 2)
+    {
+        if (isPrime[i])
+        {
+            primes.push_back(i);
+        }
+    }
+    return primes;
+}
+
+// range of l and r. 2<=l<=r<=2147483647
+vector<int> segmentedSieve(long long l, long long r, vector<int> primes = sieve())
+{
+    bool isPrime[r - l + 1];
+
+    for (int i = 0; i <= r - l; i++)
+    {
+        isPrime[i] = true;
+    }
+
+    for (int i = 0; primes->at(i) * (long long)primes->at(i) <= r; i++)
+    {
+        int currPrime = primes->at(i);
+        // Just smaller or equal value to l
+        long long base = (l / (currPrime)) * (currPrime);
+        if (base < l)
+        {
+            base = base + currPrime;
+        }
+
+        // Mark all mutliples within L To R as false
+        for (long long j = base; j <= r; j += currPrime)
+        {
+            isPrime[j - l] = false;
+        }
+
+        // There may be a case where base is itself a prime number .
+        if (base == currPrime)
+        {
+            isPrime[base - l] = true;
+        }
+    }
+    vector<int> primesInRange;
+    for (int i = 0; i <= r - l; i++)
+    {
+        if (isPrime[i] == true)
+        {
+            primesInRange.push_back(i + l);
+        }
+    }
+    return primesInRange;
+}
+
+/*----------END----------*/
+
+/*----------------All Prime factors-------------*/
+
+vector<int> sieve(int n = 1000006)
+{
+    int MAX = n;
+
+    bool isPrime[MAX];
+
+    vector<int> primes(MAX, 0);
+    for (int i = 2; i < MAX; i++)
+    {
+        isPrime[i] = true;
+    }
+    for (int i = 2; i * i < MAX; i++)
+    {
+
+        if (isPrime[i])
+        {
+            for (int j = i * i; j < MAX; j += i)
+            {
+                isPrime[j] = false;
+            }
+        }
+    }
+
+    for (int i = 2; i < MAX; i++)
+    {
+        if (primes[i] == 0)
+        {
+            int c = 1;
+            while (i * c < MAX)
+            {
+                primes[i * c] += 1;
+                c++;
+            }
+        }
+    }
+    return primes;
+}
+
+vector<vector<int>> allPrimeFactorsUpto10()
+{
+    vector<vector<int>> memo(11, vector<int>(1000006, 0));
+    primes = sieve(1000006);
+    for (int i = 0; i < 11; i++)
+    {
+        for (int j = 1; j < 1000006; j++)
+        {
+            if (primes[j] == i)
+            {
+                memo[i][j] = memo[i][j - 1] + 1;
+            }
+            else
+            {
+                memo[i][j] = memo[i][j - 1];
+            }
+        }
+    }
+    return memo;
+}
+
+/*-------END----------*/
+
+/*-----------Matrix Exponentiation-----------*/
+// For Nth Fibonacci Number in O(log(N));
+
+void multiply(int A[2][2], int M[2][2])
+{
+
+    int firstValue = A[0][0] * M[0][0] + A[0][1] * M[1][0];
+    int secondValue = A[0][0] * M[0][1] + A[0][1] * M[1][1];
+    int thirdValue = A[1][0] * M[0][0] + A[1][1] * M[1][0];
+    int fourthValue = A[1][0] * M[0][1] + A[1][1] * M[1][1];
+
+    A[0][0] = firstValue;
+    A[0][1] = secondValue;
+    A[1][0] = thirdValue;
+    A[1][1] = fourthValue;
+}
+
+void matrixPower(int A[2][2], int n)
+{
+    if (n == 1)
+    {
+        return;
+    }
+    matrixPower(A, n / 2);
+    multiply(A, A);
+    if (n & 1)
+    {
+        int M[2][2] = {{1, 1}, {1, 0}};
+        multiply(A, M);
+    }
+}
+
+int getNthFibo(int n)
+{
+    if (n == 0 || n == 1)
+    {
+        return n;
+    }
+    int A[2][2] = {{1, 1}, {1, 0}};
+    matrixPower(A, n - 1);
+    return A[0][0];
+}
+
+// O(1) using golden ratio
+
+ll fib(int n)
+{
+    double phi = (1 + sqrt(5)) / 2;
+    return (ll)(round(pow(phi, n) / sqrt(5)));
+}
+
+/*---------END-----------*/
+
+/*-------------Wilson's Theorem---------*/
+// p->prime
+// (p-1)! % p = -1 or (p-1)
+
+// Find (n!)%p
+ll pow1(ll a, ll b, ll c)
+{
+    ll ans = 1LL;
+    while (b > 0)
+    {
+        if (b & 1)
+            ans = (ans * a) % c;
+        a = (a * a) % c;
+        b = b >> 1;
+    }
+    return ans;
+}
+
+int wilson(int n, int p)
+{
+    ll i, ans, fact = 1;
+    if (n >= p)
+    {
+        return 0;
+        continue;
+    }
+    for (i = n + 1; i <= p - 1; i++)
+    {
+        fact = (fact * i) % p;
+        if (fact == 0)
+            break;
+    }
+    ans = pow1(fact, p - 2, p);
+    return p - ans;
+}
+
+/*--------------END-----------*/
 
 // Geometry
 struct Point
