@@ -36,14 +36,86 @@ void read(T &...args)
     ((cin >> args), ...);
 }
 
+template <typename T>
+std::ostream &operator<<(std::ostream &output, std::vector<T> const &values)
+{
+    for (auto const &value : values)
+    {
+        output << value << " ";
+    }
+    return output;
+}
+
+template <typename T>
+std::istream &operator>>(std::istream &input, std::vector<T> &values)
+{
+    for (auto &value : values)
+    {
+        input >> value;
+    }
+    return input;
+}
+
 ll nextNearestSquare(ll n)
 {
     return power(ceil(sqrt(n)), 2);
 }
 
-bool cmp(pair<int, int> a, pair<int, int> b)
+bool cmp(pair<int, int> &a, pair<int, int> &b)
 {
     return a.second < b.second; // ascending order by second element
+}
+
+// generate array of n distinct integer whose xor sum is k
+vll findArray(int N, int K)
+{
+    vector<ll> ans;
+    if (N == 1)
+    {
+        ans.pb(K);
+        return;
+    }
+
+    if (N == 2)
+    {
+        ans.pb(0);
+        ans.pb(K);
+        return;
+    }
+
+    int P = N - 2;
+    int Q = N - 1;
+
+    int VAL = 0;
+
+    for (int i = 1; i <= (N - 3); i++)
+    {
+        cout << " " << i;
+        VAL ^= i;
+    }
+
+    if (VAL == K)
+    {
+        while ((P ^ Q) <= P)
+        {
+            Q++;
+        }
+        ans.pb(P);
+        ans.pb(Q);
+        ans.pb(P ^ Q);
+    }
+
+    else
+    {
+
+        while ((P ^ K ^ VAL) <= N - 3)
+        {
+            P++;
+        }
+        ans.pb(P);
+        ans.pb(P ^ K ^ VAL);
+    }
+    return ans;
 }
 
 /*------------- Extended Euclid Algorithm  -----------------*/
@@ -112,9 +184,37 @@ ll gcd(ll a, ll b) // if a > b
     return gcd(b, a % b);
 }
 
+// A Function to calculate mex of all the values in
+// that set.
+int calculateMex(unordered_set<int> &Set)
+{
+    int Mex = 0;
+
+    while (Set.find(Mex) != Set.end())
+        Mex++;
+
+    return Mex;
+}
+
+// A function to Compute Grundy Number of 'n'
+// Only this function varies according to the game
+int calculateGrundy(int n)
+{
+    if (n == 0)
+        return (0);
+
+    unordered_set<int> Set; // A Hash Table
+
+    Set.insert(calculateGrundy(n / 2));
+    Set.insert(calculateGrundy(n / 3));
+    Set.insert(calculateGrundy(n / 6));
+
+    return (calculateMex(Set));
+}
+
 bool isPrime(ll x)
 {
-    for (ll i = 2; i <= sqrt(x); i++)
+    for (ll i = 2; i * i <= x; i++)
     {
         if (x % i == 0)
         {
@@ -215,6 +315,30 @@ ll power(ll x, ll y)
         }
     }
     return result;
+}
+
+// Fast nCr
+
+ll fact[100006];
+ll bigmod(ll a, ll b)
+{
+    if (!b)
+        return 1;
+    ll x = bigmod(a, b / 2);
+    x = (x * x) % mod;
+    if (b & 1)
+        x = (a * x) % mod;
+    return x;
+}
+
+ll mod_inv(ll p)
+{
+    return bigmod(p, mod - 2);
+}
+
+ll nCr1(ll n, ll r)
+{
+    return fact[n] * mod_inv(fact[r] * fact[n - r] % mod) % mod;
 }
 
 ll factorial(ll n)
@@ -401,6 +525,21 @@ vector<int> eulerPhi(int n)
     return phi;
 }
 
+ll search_smaller(vector<ll> &arr, ll st, ll en, ll search_val)
+{
+
+    if (st == en)
+        return arr[st] <= search_val ? st : -1;
+
+    ll mid_idx = st + (en - st) / 2;
+
+    if (search_val < arr[mid_idx])
+        return search(arr, st, mid_idx, search_val);
+
+    ll ret = search(arr, mid_idx + 1, en, search_val);
+    return ret == -1 ? mid_idx : ret;
+}
+
 // function generate all prime number less then N in O(n*log(log(n)))
 const long long MAX_SIZE = 1000001;
 
@@ -577,6 +716,8 @@ vector<int> sieve(int n = 1000006)
     return primes;
 }
 
+// to query for all numbers having prime factors k, between x and y
+// -> return memo[k][y]-memo[k][x-1];
 vector<vector<int>> allPrimeFactorsUpto10()
 {
     vector<vector<int>> memo(11, vector<int>(1000006, 0));
@@ -753,7 +894,37 @@ bool doIntersect(Point p1, Point q1, Point p2, Point q2)
     return false; // Doesn't fall in any of the above cases
 }
 
-// Graph
+// Area of Polygon
+class point
+{
+public:
+    double x, y;
+};
+class polygon
+{
+public:
+    point *points;
+    polygon(int number_of_points)
+    {
+        points = new point[number_of_points];
+    }
+};
+double area(polygon p, int n)
+{
+    double total_area = 0;
+    for (int i = 1; i < n - 1; i++)
+    {
+        double x1 = p.points[i].x - p.points[0].x;
+        double y1 = p.points[i].y - p.points[0].y;
+        double x2 = p.points[i + 1].x - p.points[0].x;
+        double y2 = p.points[i + 1].y - p.points[0].y;
+        double cross_product = x1 * y2 - y1 * x2;
+        total_area += cross_product;
+    }
+    return abs(total_area / 2);
+}
+
+/*------------------------ Graph -----------------------------*/
 
 // Taking input i.e Adjacency List representaion
 void adjInGraph(ll n, ll m)

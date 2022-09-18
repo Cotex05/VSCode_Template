@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-#define ll unsigned long long
+#define ll long long int
 #define tc    \
     ll t;     \
     cin >> t; \
@@ -33,53 +33,62 @@ void clk()
     cerr << "Execution Time: " << 100 * (float)(time_p) / CLOCKS_PER_SEC << "ms\n";
 }
 
-inline void multiply(ll mat1[2][2], ll mat2[2][2])
+template <typename T>
+std::ostream &operator<<(std::ostream &output, std::vector<T> const &values)
 {
-    ll new_mat[2][2] = {
-        {(((mat1[0][0])%mod * (mat2[0][0])%mod)%mod + ((mat1[0][1])%mod * (mat2[1][0])%mod)%mod)%mod,
-         (((mat1[0][0])%mod * (mat2[0][1])%mod)%mod + ((mat1[0][1])%mod * (mat2[1][1])%mod)%mod)%mod},
-        {(((mat1[1][0])%mod * (mat2[0][0])%mod)%mod + ((mat1[1][1])%mod * (mat2[1][0])%mod)%mod)%mod,
-         (((mat1[1][0])%mod * (mat2[0][1])%mod)%mod + ((mat1[1][1])%mod * (mat2[1][1])%mod)%mod)%mod}};
-    mat1[0][0] = new_mat[0][0]%mod;
-    mat1[0][1] = new_mat[0][1]%mod;
-    mat1[1][0] = new_mat[1][0]%mod;
-    mat1[1][1] = new_mat[1][1]%mod;
-}
-inline void power(ll mat[2][2], ll n)
-{
-    if (n == 0 || n == 1)
+    for (auto const &value : values)
     {
-        return;
+        output << value << " ";
     }
-    power(mat, n / 2);
-    multiply(mat, mat);
-    if (n % 2 != 0)
-    {
-        ll temp[2][2] = {{1, 1}, {1, 0}};
-        multiply(mat, temp);
-    }
-}
-inline ll fib(ll n)
-{
-    ll mat[2][2] = {{1, 1}, {1, 0}};
-    if (n == 0)
-    {
-        return 0;
-    }
-    power(mat, n - 1);
-    return mat[0][0]%mod;
-}
-inline unsigned long long fiboSum(unsigned long long m,unsigned long long n)
-{
-    return (fib(n + 2)%mod - fib(m + 1)%mod+mod)%mod;
+    return output;
 }
 
-
-void faisal()
+template <typename T>
+std::istream &operator>>(std::istream &input, std::vector<T> &values)
 {
-    ll m, n;
-    cin >> m >> n;
-    cout << fiboSum(m, n) << "\n";
+    for (auto &value : values)
+    {
+        input >> value;
+    }
+    return input;
+}
+
+ll power(ll x, ll y)
+{
+    ll result = 1;
+    while (y > 0)
+    {
+        if (y % 2 == 0) // y is even
+        {
+            x = x * x;
+            y = y / 2;
+        }
+        else // y isn't even
+        {
+            result = result * x;
+            y = y - 1;
+        }
+    }
+    return result;
+}
+
+char x, y;
+
+struct Comp
+{
+    bool operator()(const pair<ll, ll> &a, const pair<ll, ll> &b)
+    {
+        return (abs(a.first - x) > abs(b.first - x));
+    }
+};
+
+void solveC()
+{
+    ll n;
+    cin >> n;
+    vll arr(n), brr(n);
+    cin >> arr >> brr;
+    
 }
 
 int main()
@@ -93,11 +102,11 @@ int main()
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
-    tc
-    {
-        faisal();
-    }
+    // tc
+    // {
+    //     solveC();
+    // }
+    solveC();
     // clk();
-
     return 0;
 }
