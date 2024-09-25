@@ -66,6 +66,25 @@ bool cmp(pair<int, int> &a, pair<int, int> &b)
     return a.second < b.second; // ascending order by second element
 }
 
+// LIS in O(n*logn)
+int LIS(vector<int> &nums)
+{
+    vector<int> sub;
+    for (int x : nums)
+    {
+        if (sub.empty() || sub[sub.size() - 1] < x)
+        {
+            sub.push_back(x);
+        }
+        else
+        {
+            auto it = lower_bound(sub.begin(), sub.end(), x);
+            *it = x;
+        }
+    }
+    return sub.size();
+}
+
 // generate array of n distinct integer whose xor sum is k
 vll findArray(int N, int K)
 {
@@ -315,6 +334,35 @@ ll power(ll x, ll y)
         }
     }
     return result;
+}
+
+ll NCR(ll n, ll r) // NLOGR
+{
+    long long p = 1, k = 1;
+
+    if (n - r < r)
+        r = n - r;
+
+    if (r != 0)
+    {
+        while (r)
+        {
+            p *= n;
+            k *= r;
+
+            long long m = __gcd(p, k);
+            p /= m;
+            k /= m;
+
+            n--;
+            r--;
+        }
+    }
+
+    else
+        p = 1;
+
+    return p;
 }
 
 // Fast nCr
@@ -924,7 +972,145 @@ double area(polygon p, int n)
     return abs(total_area / 2);
 }
 
+/*---------------------------- Trie --------------------------------- */
+struct Node
+{
+    Node *links[26];
+    bool endOfWord;
+    bool containsKey(char ch)
+    {
+        return (links[ch - 'a'] != NULL);
+    }
+    void put(char ch, Node *node)
+    {
+        links[ch - 'a'] = node;
+    }
+    Node *get(char ch)
+    {
+        return links[ch - 'a'];
+    }
+    void setEnd()
+    {
+        endOfWord = true;
+    }
+    bool isEnd()
+    {
+        return endOfWord;
+    }
+};
+
+class Trie
+{
+private:
+    Node *root;
+
+public:
+    Trie()
+    {
+        root = new Node();
+    }
+    void insert(string word)
+    {
+        Node *node = root;
+        for (int i = 0; i < word.size(); i++)
+        {
+            if (!node->containsKey(word[i]))
+            {
+                node->put(word[i], new Node());
+            }
+            node = node->get(word[i]);
+        }
+        node->setEnd();
+    }
+    bool search(string word)
+    {
+        Node *node = root;
+        for (int i = 0; i < word.size(); i++)
+        {
+            if (!node->containsKey(word[i]))
+            {
+                return false;
+            }
+            node = node->get(word[i]);
+        }
+        return node->isEnd();
+    }
+    bool startsWith(string prefix)
+    {
+        Node *node = root;
+        for (int i = 0; i < prefix.size(); i++)
+        {
+            if (!node->containsKey(prefix[i]))
+            {
+                return false;
+            }
+            node = node->get(prefix[i]);
+        }
+        return true;
+    }
+};
+
 /*------------------------ Graph -----------------------------*/
+class Graph
+{
+public:
+    int V;
+    vector<pair<int, int>> *l;
+
+    Graph(int nodes)
+    {
+        V = nodes;
+        l = new vector<pair<int, int>>[V];
+    }
+
+    void addEdge(int x, int y, int w, int undir = true)
+    {
+        l[x].push_back({w, y});
+        if (undir)
+            l[y].push_back({w, x});
+    }
+
+    int dijkstra(int src, int dest)
+    {
+        vector<int> dist(V, INT_MAX);
+        set<pair<int, int>> set;
+
+        dist[src] = 0;
+        set.insert({0, src});
+
+        while (!set.empty())
+        {
+            auto it = set.begin();
+            int node = it->second;
+            int distTillNow = it->first;
+            set.erase(it);
+
+            for (auto nbrPair : l[node])
+            {
+                int nbr = nbrPair.second;
+                int currEdge = nbrPair.first;
+
+                if (distTillNow + currEdge < dist[nbr])
+                {
+
+                    auto f = set.find({dist[nbr], nbr});
+                    if (f != set.end())
+                    {
+                        set.erase(f);
+                    }
+
+                    dist[nbr] = distTillNow + currEdge;
+                    set.insert({dist[nbr], nbr});
+                }
+            }
+        }
+        for (int i = 0; i < V; i++)
+        {
+            cout << "Distance from " << src << " to " << i << " is " << dist[i] << "\n";
+        }
+        return dist[dest];
+    }
+};
 
 // Taking input i.e Adjacency List representaion
 void adjInGraph(ll n, ll m)

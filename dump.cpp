@@ -26,6 +26,209 @@ void BFS(ll s, vector<int> adj[], ll n)
     }
 }
 
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    ll kitne_cases_hain;
+    kitne_cases_hain = 1;
+    cin >> kitne_cases_hain;
+    while (kitne_cases_hain--)
+    {
+        ll n;
+        cin >> n;
+        string s;
+        cin >> s;
+        if (s[0] == '0')
+        {
+            for (int i = 0; i < 2 * n; i++)
+            {
+                if (s[i] == '1')
+                {
+                    s[i] = '0';
+                }
+                else
+                {
+                    s[i] = '1';
+                }
+            }
+        }
+        vector<ll> v;
+        ll cnt;
+        ll flag = 0;
+        ll p;
+        for (int i = 0; i < 2 * n; i++)
+        {
+            if (s[i] == '0')
+            {
+                v.push_back(i);
+            }
+            if (s[i] != s[2 * n - i - 1])
+            {
+                flag = 1;
+                break;
+            }
+        }
+        if (flag)
+        {
+            cout << "1\n";
+            cout << 2 * n << "\n";
+            continue;
+        }
+        if (v.size() == 0)
+        {
+            cout << "-1\n";
+        }
+        else
+        {
+            cnt = 2 * n - 1 - v.back();
+            for (int i = v.size() - 1; i >= 1; i--)
+            {
+                if (v[i] - v[i - 1] - 1 != cnt)
+                {
+                    flag = 1;
+                    cout << "2\n";
+                    cout << v[i - 1] + 1 << " " << 2 * n - 1 - v[i - 1] << "\n";
+                    break;
+                }
+            }
+            if (flag == 0)
+            {
+                cout << "2\n";
+                cout << v[v.size() - 2] + 2 << " " << 2 * n - 2 - v[v.size() - 2] << "\n";
+            }
+        }
+    }
+    return 0;
+}
+
+if (n == 1)
+    {
+        cout << arr[0] << "\n";
+        return;
+    }
+    unordered_map<ll, ll> mp;
+    ll mx = 0;
+    for (auto &e : arr)
+    {
+        mp[e]++;
+        mx = max(e, mx);
+    }
+    ll ans = 0;
+    for (ll i = mx; i >= 1; i--)
+    {
+        ll c = i;
+        auto hash = mp;
+        for (ll j = i; j > 0;)
+        {
+            ll f = 0;
+            if (hash.find(j) != hash.end())
+            {
+                hash[j]--;
+                if (hash[j] <= 0)
+                {
+                    hash.erase(j);
+                }
+                ll k = 1;
+                while (1)
+                {
+                    if (c - 2 * k <= 0)
+                    {
+                        f = 1;
+                        break;
+                    }
+                    if (hash.find(c - 2 * k) != hash.end())
+                    {
+                        hash[c - 2 * k]--;
+                        if (hash[c - 2 * k] <= 0)
+                        {
+                            hash.erase(c - 2 * k);
+                        }
+                        hash[c - 2 * k + j - 1]++;
+                        break;
+                    }
+                    k++;
+                }
+                j -= 2;
+            }
+            else
+            {
+                c = 0;
+                break;
+            }
+            if (f)
+            {
+                c = 0;
+                break;
+            }
+        }
+        ans = max(c, ans);
+    }
+    cout << ans << "\n";
+
+#include <bits/stdc++.h>
+#define int long long
+using namespace std;
+int n, m, s, t;
+string a[500001];
+map<pair<int, int>, bool> vis;
+void dfs(int x, int y)
+{
+    if (x < 1 || y < 1 || x > n || y > m)
+        return;
+    if (vis[{x, y}] || a[x][y - 1] == '#')
+        return;
+    t = max(t, x);
+    vis[{x, y}] = true;
+    dfs(x - 1, y);
+    dfs(x + 1, y);
+    dfs(x, y - 1);
+    dfs(x, y + 1);
+}
+void solve()
+{
+    vis.clear();
+    t = s = 0;
+    cin >> n >> m;
+    for (int i = 1; i <= n; ++i)
+        cin >> a[i];
+    if (n == 1)
+    {
+        for (int i = 0; i < m; ++i)
+            if (a[1][i] == '#')
+            {
+                puts("1");
+                return;
+            }
+        puts("0");
+        return;
+    }
+    dfs(1, 1);
+    while (!vis[{n, m}])
+    {
+        s++;
+        if (t == n)
+            break;
+        for (int i = 1; i <= m; ++i)
+            a[t + 1][i - 1] = '.';
+        for (int i = 1; i <= m; ++i)
+            vis[{t + 1, i}] = false;
+        dfs(t + 1, 1);
+    }
+    cout << s << endl;
+}
+signed main()
+{
+    int T;
+    cin >> T;
+    while (T--)
+        solve();
+}
+
 void DFS(int s, vector<int> adj[], int n, vector<bool> &vis)
 {
     vis[s] = true;
